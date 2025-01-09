@@ -16,7 +16,7 @@ import nltk
 nltk.download('punkt')
 ```
 
-<h3>In the ```transformation``` folder, create a symbolic link to the ```utils``` folder</h3>
+<h3>In the transformation folder, create a symbolic link to the utils folder</h3>
 
 ```bash
 cd transformation
