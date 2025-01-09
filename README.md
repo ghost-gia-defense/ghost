@@ -1,6 +1,7 @@
 <h1>Ghost Demo</h1>
 
 <h3>Install the below required packages and download the required data</h3>
+
 ```bash
 conda create -n LMGIA python=3.12.3
 conda activate LMGIA
@@ -16,12 +17,14 @@ nltk.download('punkt')
 ```
 
 <h3>In the ```transformation``` folder, create a symbolic link to the ```utils``` folder</h3>
+
 ```bash
 cd transformation
 ln -s ../utils utils
 ```
 
 <h3>Run the below command to see a Ghost demo</h3>
+
 ```bash
 python transform_data_discrete_bert_full.py
 ```
