@@ -1,11 +1,13 @@
 from transformers import BertModel, BertTokenizerFast
 from datasets import load_dataset
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils import *
 import json
 import random
 from argparse import ArgumentParser
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 parser = ArgumentParser("Transform data using discrete optimization")
 parser.add_argument("--data", type=str, default="sst2", help="The dataset to use")

@@ -18,6 +18,12 @@ conda activate GHOST
 You need to install torch. Our expected version is `2.3.0`. You need to check
 the [official PyTorch website](https://pytorch.org/get-started/previous-versions/) to install the corresponding one to your system (Windows, Linux, Mac).
 
+For Linux, run the following command to install torch.
+
+```bash
+pip install torch==2.3.0 --index-url https://download.pytorch.org/whl/cu121
+```
+
 Then, run the following commands to install the required packages.
 ```bash
 pip install transformers==4.44.2 datasets==2.19.1 evaluate==0.4.2 accelerate==0.30.1 nltk==3.8.1 spacy==3.8.2 absl-py==2.1.0 rouge_score==0.1.2 scikit-learn==1.6.0 bitsandbytes==0.45.0 peft==0.14.0
