@@ -1,9 +1,9 @@
 # GHOST Demo
 
-This is a demo for the GHOST defense against gradient inversion attacks for language models. This demo is on BERT model and DAGER attack. Full supports for other models and attacks will be released upon publication.
+This is a demo for the GHOST defense against gradient inversion attacks for language models. This demo is on BERT model. Full supports for other models and attacks will be released upon publication.
 The code is tested on Linux system with one NVIDIA H100 GPU.
 
-## Install
+## Installation
 First, make sure you have conda installed. You can download and
 install [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install) corresponding to your system (Windows, Linux, Mac) from their
 official websites.
@@ -31,7 +31,8 @@ python -m spacy download en_core_web_sm
 python -c "import nltk; nltk.download('punkt')"
 ```
 
-<h3>Run the below command to see a GHOST obfuscation demo</h3>
+## Obfuscation
+Run the below command to see a GHOST obfuscation demo.
 
 ```bash
 cd obfuscation
@@ -57,3 +58,7 @@ options:
 ```
 
 By default, this script will obfuscate `10` samples from the `SST-2` dataset with the `bert-base-uncased` model. This is for demonstration purposes so that you can quickly see how GHOST obfuscates data. You can change the `--num_of_samples` argument to obfuscate more samples. The obfuscated data will be saved in the `data/bert-base-uncased` folder in json format.
+
+## Attack
+
+For the attacks, you will need to refer to the original implementations and substitute the obfuscated data in. The [LAMP repository](https://github.com/eth-sri/lamp) integrates the DLG, TAG, and LAMP attack. For the rest, refer to [GRAB](https://github.com/Trusted-System-Lab/GRAB) and [DAGER](https://github.com/insait-institute/dager-gradient-inversion). The full integration of our obfuscated data into these attacks will be made available upon publication.
