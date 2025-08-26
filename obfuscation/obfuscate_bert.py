@@ -1,16 +1,17 @@
-from transformers import AutoModel, AutoTokenizer
+from transformers import BertModel, BertTokenizerFast
 from datasets import load_dataset
 from utils import *
 import json
 import random
 from argparse import ArgumentParser
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 parser = ArgumentParser("Transform data using discrete optimization")
 parser.add_argument("--data", type=str, default="sst2", help="The dataset to use")
 parser.add_argument("--device", type=str, default="cuda:0", help="The device to use")
-parser.add_argument("--num_of_samples", type=int, default=50, help="The number of samples to use")
-parser.add_argument("--model_name", type=str, default="microsoft/deberta-v3-small", help="The model to use")
+parser.add_argument("--num_of_samples", type=int, default=10, help="The number of samples to use")
+parser.add_argument("--model_name", type=str, default="bert-base-uncased", help="The model to use")
 parser.add_argument("--beam_width", type=int, default=1, help="The beam width to use")
 parser.add_argument("--overlap", type=float, default=0.1, help="The overlap between neighbours")
 parser.add_argument("--topk", type=int, default=70, help="The number of neighbours to use")
@@ -30,6 +31,7 @@ overlap = args.overlap
 recover_batch = args.recover_batch
 
 print("Model:", model_name)
+print("Dataset:", data)
 
 directory = f"../data/{model_name.split('/')[-1]}"
 if not os.path.exists(directory):
@@ -38,11 +40,11 @@ if not os.path.exists(directory):
     except FileExistsError:
         pass
 
-model = AutoModel.from_pretrained(model_name)
+model = BertModel.from_pretrained(model_name)
 model.to(device)
 model.eval()
 
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = BertTokenizerFast.from_pretrained(model_name)
 if data == "cola" or data == "sst2":
     dataset = load_dataset("glue", data)["train"]
     sentences = dataset["sentence"]
@@ -90,7 +92,6 @@ for i in range(len(topk_neighbours)):
     topk_neighbours[i] = topk_neighbours[i][1:]
 
 topk_neighbours = get_topk_neighbours_lemma(topk_neighbours, overlap, topk, tokenizer)
-
 #
 # Tokenize the sentences
 tokenized_sentences = tokenizer(sentences, return_tensors="pt", padding=True, truncation=True)
@@ -133,6 +134,6 @@ for batch in dataloader:
     i += 1
 
     with open(
-            f"../data/{model_name.split('/')[-1]}/{data}_top_{topk}_beam_{beam_width}_overlap_{overlap}_discrete_transformed_data.json",
+            f"../data/{model_name}/{data}_top_{topk}_beam_{beam_width}_overlap_{overlap}_discrete_transformed_data.json",
             "w") as f:
         json.dump({"transformed_sentences": transformed_data, "labels": labels, "original_sentences": sentences}, f)
