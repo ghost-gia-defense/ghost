@@ -9,21 +9,21 @@ import random
 from argparse import ArgumentParser
 
 
-parser = ArgumentParser("Transform data using discrete optimization")
-parser.add_argument("--data", type=str, default="sst2", help="The dataset to use")
+parser = ArgumentParser("Obfuscate data with GHOST")
+parser.add_argument("--dataset", type=str, default="sst2", help="The target dataset")
 parser.add_argument("--device", type=str, default="cuda:0", help="The device to use")
-parser.add_argument("--num_of_samples", type=int, default=10, help="The number of samples to use")
-parser.add_argument("--model_name", type=str, default="bert-base-uncased", help="The model to use")
-parser.add_argument("--beam_width", type=int, default=1, help="The beam width to use")
-parser.add_argument("--overlap", type=float, default=0.1, help="The overlap between neighbours")
-parser.add_argument("--topk", type=int, default=70, help="The number of neighbours to use")
-parser.add_argument("--recover_batch", type=int, default=0, help="The batch to recover from")
+parser.add_argument("--num_of_samples", type=int, default=10, help="The number of samples being obfuscated")
+parser.add_argument("--model_name", type=str, default="bert-base-uncased", help="The model being fine-tuned")
+parser.add_argument("--beam_width", type=int, default=1, help="The beam width to use in GHOST")
+parser.add_argument("--overlap", type=float, default=0.1, help="The overlap ratio between neighbours to use in GHOST")
+parser.add_argument("--topk", type=int, default=70, help="The top-k neighbours being evaluated in GHOST")
+parser.add_argument("--recover_batch", type=int, default=0, help="The batch to recover from in case of interruption")
 args = parser.parse_args()
 
 random.seed(42)
 torch.manual_seed(42)
 
-data = args.data
+dataset = args.dataset
 device = args.device
 num_of_samples = args.num_of_samples
 beam_width = args.beam_width
@@ -33,7 +33,7 @@ overlap = args.overlap
 recover_batch = args.recover_batch
 
 print("Model:", model_name)
-print("Dataset:", data)
+print("Dataset:", dataset)
 
 directory = f"../data/{model_name.split('/')[-1]}"
 if not os.path.exists(directory):
@@ -47,19 +47,19 @@ model.to(device)
 model.eval()
 
 tokenizer = BertTokenizerFast.from_pretrained(model_name)
-if data == "cola" or data == "sst2":
-    dataset = load_dataset("glue", data)["train"]
+if dataset == "cola" or dataset == "sst2":
+    dataset = load_dataset("glue", dataset)["train"]
     sentences = dataset["sentence"]
     labels = dataset["label"]
-elif data == "rotten_tomatoes":
-    dataset = load_dataset(data)["train"]
+elif dataset == "rotten_tomatoes":
+    dataset = load_dataset(dataset)["train"]
     sentences = dataset["text"]
     labels = dataset["label"]
-elif data == "tweeter":
+elif dataset == "tweeter":
     dataset = load_dataset("SetFit/tweet_sentiment_extraction")["train"]
     sentences = dataset["text"]
     labels = dataset["label"]
-elif data == "yahoo":
+elif dataset == "yahoo":
     dataset = load_dataset("yahoo_answers_topics")["train"]
     sentences = dataset["question_title"]
     labels = dataset["topic"]
@@ -104,7 +104,7 @@ dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
 #
 if recover_batch > 0:
     previous_data = json.load(open(
-        f"../data/{model_name.split('/')[-1]}/{data}_top_{topk}_beam_{beam_width}_overlap_{overlap}_discrete_transformed_data.json",
+        f"../data/{model_name.split('/')[-1]}/{dataset}_top_{topk}_beam_{beam_width}_overlap_{overlap}_discrete_transformed_data.json",
         "r"))
     transformed_data = previous_data["transformed_sentences"]
 else:
@@ -136,6 +136,6 @@ for batch in dataloader:
     i += 1
 
     with open(
-            f"../data/{model_name}/{data}_top_{topk}_beam_{beam_width}_overlap_{overlap}_discrete_transformed_data.json",
+            f"../data/{model_name}/{dataset}_top_{topk}_beam_{beam_width}_overlap_{overlap}_discrete_transformed_data.json",
             "w") as f:
         json.dump({"transformed_sentences": transformed_data, "labels": labels, "original_sentences": sentences}, f)
